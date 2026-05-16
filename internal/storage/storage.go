@@ -163,19 +163,19 @@ func ResetDataDirPath() string {
 	return defaultDir
 }
 
-// getDefaultResultOutputDir 默认输出目录：应用可执行文件所在目录。
-// 若无法解析可执行文件路径，回落到当前工作目录。
+// getDefaultResultOutputDir 默认输出目录：应用可执行文件所在目录下的 output 文件夹。
+// 若无法解析可执行文件路径，回落到当前工作目录下的 output。
 func getDefaultResultOutputDir() string {
+	base := "."
 	if exe, err := os.Executable(); err == nil {
 		if resolved, err := filepath.EvalSymlinks(exe); err == nil {
 			exe = resolved
 		}
-		return filepath.Dir(exe)
+		base = filepath.Dir(exe)
+	} else if cwd, err := os.Getwd(); err == nil {
+		base = cwd
 	}
-	if cwd, err := os.Getwd(); err == nil {
-		return cwd
-	}
-	return "."
+	return filepath.Join(base, "output")
 }
 
 // GetResultOutputDir 获取注册结果输出目录（默认为应用可执行文件所在目录）
@@ -290,14 +290,14 @@ func NormalizeProxyAddress(s string) string {
 	return s
 }
 
-// migrateData 将旧目录中的 accounts.dat 迁移到新目录
+// migrateData 将旧目录中的数据文件迁移到新目录
 func migrateData(oldDir, newDir string) (int, error) {
 	migrated := 0
-	items := []string{"accounts.dat"}
+	items := []string{"accounts.json", "accounts.dat"}
 
 	for _, item := range items {
 		src := filepath.Join(oldDir, item)
-		dst := filepath.Join(newDir, item)
+		dst := filepath.Join(newDir, "accounts.json")
 
 		if _, err := os.Stat(src); err != nil {
 			continue
@@ -320,7 +320,7 @@ func migrateData(oldDir, newDir string) (int, error) {
 
 // GetAccountsPath 获取微软邮箱账号文件路径
 func GetAccountsPath() string {
-	return filepath.Join(GetDataDir(), "accounts.dat")
+	return filepath.Join(GetDataDir(), "accounts.json")
 }
 
 // ===== Accounts 内存缓存（消除并发文件 I/O 瓶颈）=====

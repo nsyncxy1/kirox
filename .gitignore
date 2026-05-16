@@ -1,7 +1,9 @@
 # Build output
 build/bin/
 build/windows/
+build/linux/
 build/appicon.png
+build/darwin/iconfile.icns
 *.exe
 *.exe~
 *.dll
@@ -12,6 +14,7 @@ build/appicon.png
 # Frontend build artifacts
 frontend/dist/
 frontend/node_modules/
+package-lock.json
 
 # Go
 *.test
@@ -36,7 +39,6 @@ desktop.ini
 *.log.*
 
 # Data & user config (runtime files, not source)
-*.dat
 results/
 output/
 

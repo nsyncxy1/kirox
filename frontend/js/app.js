@@ -321,6 +321,14 @@ async function loadConfig() {
   }
   console.log('[启动] Wails runtime 已就绪');
 
+  // 检测平台，macOS 使用原生窗口控件
+  try {
+    const env = await window.runtime.Environment();
+    if (env && env.platform === 'darwin') {
+      document.body.classList.add('platform-darwin');
+    }
+  } catch(e) {}
+
   // 直接显示主界面
   console.log('[启动] 显示主界面');
   const mainContainer = document.getElementById('main-container');
