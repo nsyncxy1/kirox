@@ -77,7 +77,7 @@ const distJsDir = path.join(distDir, 'js');
 if (!fs.existsSync(distJsDir)) {
   fs.mkdirSync(distJsDir, { recursive: true });
 }
-const jsFiles = ['accounts.js', 'task.js', 'overview.js', 'app.js', 'moemail.js', 'ui.js'];
+const jsFiles = ['accounts.js', 'task.js', 'overview.js', 'app.js', 'moemail.js', 'duckmail.js', 'ui.js'];
 for (const file of jsFiles) {
   fs.copyFileSync(path.join(jsDir, file), path.join(distJsDir, file));
 }

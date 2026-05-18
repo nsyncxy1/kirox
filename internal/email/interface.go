@@ -79,3 +79,48 @@ func (a *moEmailAdapter) GetAddress() string {
 	}
 	return a.provider.GetAddress()
 }
+
+// ---- DuckMail 适配器 ----
+
+// DuckMailServiceAdapter 适配器，将 DuckMailProvider 包装为 TempEmailService
+type DuckMailServiceAdapter struct {
+	config   DuckMailConfig
+	provider *DuckMailProvider
+}
+
+// NewDuckMailService 创建 DuckMail 临时邮箱服务
+func NewDuckMailService(config DuckMailConfig) *DuckMailServiceAdapter {
+	return &DuckMailServiceAdapter{config: config}
+}
+
+// SetProvider 将外部已创建的 DuckMailProvider 注入适配器（避免重复创建邮箱）
+func (a *DuckMailServiceAdapter) SetProvider(p *DuckMailProvider) {
+	a.provider = p
+}
+
+// Create 创建 DuckMail 临时邮箱
+func (a *DuckMailServiceAdapter) Create() string {
+	provider, err := NewDuckMailProvider(a.config)
+	if err != nil {
+		log.Printf("[DuckMail] 创建邮箱失败: %v", err)
+		return ""
+	}
+	a.provider = provider
+	return provider.GetAddress()
+}
+
+// WaitForCode 等待 DuckMail 验证码
+func (a *DuckMailServiceAdapter) WaitForCode(timeout, interval int) (string, error) {
+	if a.provider == nil {
+		return "", nil
+	}
+	return a.provider.WaitForCode(timeout, interval)
+}
+
+// GetAddress 获取 DuckMail 邮箱地址
+func (a *DuckMailServiceAdapter) GetAddress() string {
+	if a.provider == nil {
+		return ""
+	}
+	return a.provider.GetAddress()
+}

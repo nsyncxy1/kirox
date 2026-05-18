@@ -266,6 +266,15 @@ function getFormConfig() {
     }
   }
 
+  // 如果选择了 DuckMail，添加配置列表
+  if (config.emailProvider === 'duckmail') {
+    var duckmailCfgs = typeof getSelectedDuckMailConfigs === 'function' ? getSelectedDuckMailConfigs() : [];
+    if (!duckmailCfgs || duckmailCfgs.length === 0) {
+      throw new Error('请先添加至少一个 DuckMail 配置');
+    }
+    config.duckmailConfigs = duckmailCfgs;
+  }
+
   return config;
 }
 
@@ -375,6 +384,8 @@ async function loadConfig() {
 window.addEventListener('DOMContentLoaded', async function() {
   await loadConfig();
   initEmailProviderSelection();
+  // 初始化 DuckMail
+  if (typeof initDuckMail === 'function') initDuckMail();
   // 启动时静默检查更新
   setTimeout(checkUpdateOnStartup, 2000);
 });

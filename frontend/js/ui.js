@@ -158,32 +158,38 @@ function initEmailProviderSelection() {
 function selectEmailProvider(provider) {
   selectedEmailProvider = provider;
 
-  // 更新按钮样式
-  const outlookBtn = document.querySelector('label[onclick*="outlook"]');
-  const moemailBtn = document.querySelector('label[onclick*="moemail"]');
+  // 更新按鈕样式
+  const outlookBtn  = document.querySelector('label[onclick*="outlook"]');
+  const moemailBtn  = document.querySelector('label[onclick*="moemail"]');
+  const duckmailBtn = document.querySelector('label[onclick*="duckmail"]');
 
-  if (provider === 'outlook') {
-    outlookBtn.style.borderColor = 'var(--primary)';
-    outlookBtn.style.background = 'rgba(59, 130, 246, 0.1)';
-    moemailBtn.style.borderColor = 'var(--border)';
-    moemailBtn.style.background = 'transparent';
-  } else {
-    outlookBtn.style.borderColor = 'var(--border)';
-    outlookBtn.style.background = 'transparent';
-    moemailBtn.style.borderColor = 'var(--primary)';
-    moemailBtn.style.background = 'rgba(59, 130, 246, 0.1)';
+  [outlookBtn, moemailBtn, duckmailBtn].forEach(function(btn) {
+    if (btn) { btn.style.borderColor = 'var(--border)'; btn.style.background = 'transparent'; }
+  });
+
+  var activeBtn = provider === 'outlook' ? outlookBtn : provider === 'moemail' ? moemailBtn : duckmailBtn;
+  if (activeBtn) {
+    activeBtn.style.borderColor = 'var(--primary)';
+    activeBtn.style.background = 'rgba(59, 130, 246, 0.1)';
   }
 
-  // 显示/隐藏 MoeMail 配置选择
-  const moemailConfigDiv = document.getElementById('moemail-config-select');
-  const hintDiv = document.getElementById('email-provider-hint');
+  // 显示/隐藏各渠道配置面板
+  const moemailConfigDiv  = document.getElementById('moemail-config-select');
+  const duckmailConfigDiv = document.getElementById('duckmail-config-select');
+  const hintDiv           = document.getElementById('email-provider-hint');
+
+  if (moemailConfigDiv)  moemailConfigDiv.style.display  = 'none';
+  if (duckmailConfigDiv) duckmailConfigDiv.style.display = 'none';
 
   if (provider === 'moemail') {
     moemailConfigDiv.style.display = 'block';
     hintDiv.textContent = '使用 MoeMail 临时邮箱进行注册，每次任务会自动生成新邮箱。';
     loadMoeMailDomainsToList();
+  } else if (provider === 'duckmail') {
+    duckmailConfigDiv.style.display = 'block';
+    hintDiv.textContent = '使用 DuckMail 临时邮箱进行注册，每次任务会自动生成新邮箱。';
+    if (typeof renderDuckMailConfigSelect === 'function') renderDuckMailConfigSelect();
   } else {
-    moemailConfigDiv.style.display = 'none';
     hintDiv.textContent = '使用微软邮箱进行注册，代理配置请在设置页设置。';
   }
 }

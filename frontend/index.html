@@ -529,6 +529,33 @@
                   <span>MoeMail</span>
                 </div>
               </label>
+              <label style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;" onclick="selectEmailProvider('duckmail')">
+                <input type="radio" name="email-provider" value="duckmail" style="display:none;">
+                <div id="provider-duckmail" style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f59e0b;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 12l2 2 4-4"/>
+                  </svg>
+                  <span>DuckMail</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- DuckMail 配置选择 -->
+          <div id="duckmail-config-select" style="display:none;margin-bottom:16px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f59e0b;"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg>
+                  <span>DuckMail 配置</span>
+                </div>
+                <button type="button" onclick="selectAllDuckMailConfigs()" class="moemail-select-all-btn">全选配置</button>
+              </label>
+              <div id="cfg-duckmail-configs-list" class="moemail-domains-container">
+                <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px;">加载中...</div>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">邮箱名将自动随机生成</div>
             </div>
           </div>
 
@@ -573,6 +600,59 @@
     <!-- ===== Page: 邮箱池 ===== -->
     <div class="page" id="page-accounts">
       <div class="page-scroll" style="max-width:800px;margin:0 auto;">
+
+        <!-- DuckMail 配置 -->
+        <div class="card" style="flex-shrink:0;margin-bottom:20px;">
+          <div class="settings-group">
+            <div class="settings-group-title" style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f59e0b;">
+                  <circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/>
+                </svg>
+                <span>DuckMail 临时邮箱</span>
+              </div>
+              <span id="settings-duckmail-summary" style="font-size:12px;font-weight:600;color:var(--text-muted);padding:4px 10px;background:var(--bg-subtle);border-radius:6px;">未配置</span>
+            </div>
+            <div class="moemail-add-section">
+              <div class="moemail-add-header">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span>添加新配置</span>
+              </div>
+              <div class="moemail-add-body">
+                <div class="moemail-input-row">
+                  <div class="moemail-input-group" style="flex:1;">
+                    <label>名称 <span style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(可选)</span></label>
+                    <input type="text" id="duckmail-inline-name" placeholder="自动生成" class="form-input">
+                  </div>
+                  <div class="moemail-input-group" style="flex:2;">
+                    <label>API URL</label>
+                    <input type="text" id="duckmail-inline-url" placeholder="https://api.duckmail.sbs" class="form-input">
+                  </div>
+                  <div class="moemail-input-group" style="flex:1.5;">
+                    <label>API Key</label>
+                    <input type="text" id="duckmail-inline-apikey" placeholder="dk_xxxxxxxx" class="form-input">
+                  </div>
+                  <div class="moemail-input-group" style="flex:1.5;">
+                    <label>域名</label>
+                    <input type="text" id="duckmail-inline-domain" placeholder="example.com" class="form-input">
+                  </div>
+                </div>
+                <div class="moemail-action-row">
+                  <button onclick="inlineTestDuckMail()" class="btn btn-secondary btn-sm" id="duckmail-inline-test-btn">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    测试连接
+                  </button>
+                  <button onclick="inlineAddDuckMail()" class="btn btn-dark btn-sm">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    添加配置
+                  </button>
+                  <span id="duckmail-inline-status" class="moemail-status-text"></span>
+                </div>
+              </div>
+            </div>
+            <div id="duckmail-inline-list" class="moemail-config-list"></div>
+          </div>
+        </div>
 
         <!-- MoeMail 配置 -->
         <div class="card" style="flex-shrink:0;margin-bottom:20px;">
@@ -767,6 +847,7 @@
 
 <script src="js/accounts.js"></script>
 <script src="js/moemail.js"></script>
+<script src="js/duckmail.js"></script>
 <script src="js/task.js"></script>
 <script src="js/overview.js"></script>
 <script src="js/ui.js"></script>

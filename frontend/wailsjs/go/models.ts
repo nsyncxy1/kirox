@@ -1,5 +1,23 @@
 export namespace email {
 	
+	export class DuckMailConfig {
+	    name: string;
+	    apiUrl: string;
+	    apiKey: string;
+	    domain: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DuckMailConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.apiUrl = source["apiUrl"];
+	        this.apiKey = source["apiKey"];
+	        this.domain = source["domain"];
+	    }
+	}
 	export class MoeMailConfig {
 	    name: string;
 	    url: string;
@@ -30,6 +48,7 @@ export namespace task {
 	    moemailDomains: string[];
 	    moemailConfigs: Record<string, Array<email.MoeMailConfig>>;
 	    moemailRandomMode: boolean;
+	    duckmailConfigs: email.DuckMailConfig[];
 	
 	    static createFrom(source: any = {}) {
 	        return new StartTaskRequest(source);
@@ -45,6 +64,7 @@ export namespace task {
 	        this.moemailDomains = source["moemailDomains"];
 	        this.moemailConfigs = this.convertValues(source["moemailConfigs"], Array<email.MoeMailConfig>, true);
 	        this.moemailRandomMode = source["moemailRandomMode"];
+	        this.duckmailConfigs = this.convertValues(source["duckmailConfigs"], email.DuckMailConfig);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

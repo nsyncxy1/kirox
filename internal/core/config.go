@@ -36,6 +36,10 @@ type Config struct {
 
 	MoEmailBaseURL string
 	MoEmailAPIKey  string
+
+	UseDuckMail      bool
+	DuckMailConfig   *email.DuckMailConfig
+	DuckMailProvider *email.DuckMailProvider
 }
 
 // NewConfig 创建默认配置

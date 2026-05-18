@@ -22,10 +22,11 @@ type StartTaskRequest struct {
 	Concurrency       int                              `json:"concurrency"`
 	Delay             int                              `json:"delay"`
 	OutputPath        string                           `json:"outputPath"`
-	EmailProvider     string                           `json:"emailProvider"`     // "outlook" 或 "moemail"
+	EmailProvider     string                           `json:"emailProvider"`     // "outlook"、"moemail" 或 "duckmail"
 	MoeMailDomains    []string                         `json:"moemailDomains"`    // 选中的域名列表
 	MoeMailConfigs    map[string][]email.MoeMailConfig `json:"moemailConfigs"`    // 域名 -> 配置列表映射
 	MoeMailRandomMode bool                             `json:"moemailRandomMode"` // 是否为随机模式
+	DuckMailConfigs   []email.DuckMailConfig           `json:"duckmailConfigs"`   // DuckMail 配置列表
 }
 
 // StartTask 公开方法（包装器）
@@ -60,6 +61,13 @@ func startTask(req StartTaskRequest) map[string]interface{} {
 			return map[string]interface{}{"error": "MoeMail 配置缺失"}
 		}
 		// MoeMail 不需要预先加载账号，每次任务动态生成
+	} else if emailProvider == "duckmail" {
+		// DuckMail 模式：验证配置列表
+		if len(req.DuckMailConfigs) == 0 {
+			Manager.mu.Unlock()
+			return map[string]interface{}{"error": "请至少添加一个 DuckMail 配置"}
+		}
+		// DuckMail 不需要预先加载账号，每次任务动态生成
 	} else {
 		// Outlook 模式：加载账号列表
 		storedAccounts := storage.GetAccountsCached()
@@ -193,6 +201,16 @@ func runBatch(req StartTaskRequest, emailProvider string, outlookAccounts []emai
 		}
 
 		log.Printf("[Kiro] MoeMail 域名池: %v (共 %d 个域名)", moemailDomainPool, len(moemailDomainPool))
+	} else if emailProvider == "duckmail" {
+		taskConfig.UseDuckMail = true
+		if len(req.DuckMailConfigs) == 0 {
+			log.Println("[Kiro] DuckMail 配置为空，任务终止")
+			Manager.mu.Lock()
+			Manager.running = false
+			Manager.mu.Unlock()
+			return
+		}
+		log.Printf("[Kiro] DuckMail 配置数: %d", len(req.DuckMailConfigs))
 	} else if emailProvider == "outlook" {
 		taskConfig.UseOutlook = true
 	}
@@ -234,6 +252,17 @@ func runBatch(req StartTaskRequest, emailProvider string, outlookAccounts []emai
 
 		configs := moemailDomainConfigs[domain]
 		return domain, configs[rand.Intn(len(configs))]
+	}
+
+	// DuckMail 配置轮询索引（并发安全）
+	var duckMailIdx int
+	var duckMailMu sync.Mutex
+	nextDuckMailConfig := func() email.DuckMailConfig {
+		duckMailMu.Lock()
+		defer duckMailMu.Unlock()
+		cfg := req.DuckMailConfigs[duckMailIdx%len(req.DuckMailConfigs)]
+		duckMailIdx++
+		return cfg
 	}
 
 	// send-otp 400 熔断：任一任务遇到该错误即终止全部并发任务（只触发一次）
@@ -288,6 +317,24 @@ func runBatch(req StartTaskRequest, emailProvider string, outlookAccounts []emai
 			}
 
 			taskCfg.MoeMailProvider = provider
+			currentEmail = provider.GetAddress()
+		} else if emailProvider == "duckmail" {
+			// DuckMail 模式：动态创建临时邮箱
+			duckCfg := nextDuckMailConfig()
+			log.Printf("[Kiro][%d/%d] 创建 DuckMail 邮箱 (配置: %s, 域名: %s)", i+1, req.Count, duckCfg.Name, duckCfg.Domain)
+
+			provider, err := email.NewDuckMailProvider(duckCfg)
+			if err != nil {
+				log.Printf("[Kiro][%d/%d] 生成 DuckMail 邮箱失败: %v", i+1, req.Count, err)
+				Manager.mu.Lock()
+				Manager.completed++
+				Manager.failed++
+				Manager.mu.Unlock()
+				return
+			}
+
+			taskCfg.DuckMailProvider = provider
+			taskCfg.DuckMailConfig = &duckCfg
 			currentEmail = provider.GetAddress()
 		}
 

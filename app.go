@@ -166,6 +166,20 @@ func (a *App) TestMoeMailConnection(configJSON string) map[string]interface{} {
 	return email.TestMoeMailConnection(configJSON)
 }
 
+// ---- DuckMail ----
+
+func (a *App) GetDuckMailConfigs() []email.DuckMailConfig {
+	return email.GetDuckMailConfigs()
+}
+
+func (a *App) SaveDuckMailConfigs(configsJSON string) map[string]interface{} {
+	return email.SaveDuckMailConfigs(configsJSON)
+}
+
+func (a *App) TestDuckMailConnection(configJSON string) map[string]interface{} {
+	return email.TestDuckMailConnection(configJSON)
+}
+
 // ---- Outlook ----
 
 func (a *App) AddOutlookAccounts(data string) map[string]interface{} {

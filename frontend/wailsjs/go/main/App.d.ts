@@ -19,6 +19,8 @@ export function DownloadUpdate():Promise<Record<string, any>>;
 
 export function GetDataDir():Promise<string>;
 
+export function GetDuckMailConfigs():Promise<Array<email.DuckMailConfig>>;
+
 export function GetLicenseInfo():Promise<Record<string, any>>;
 
 export function GetLogs():Promise<Array<string>>;
@@ -49,6 +51,8 @@ export function ResetProxy():Promise<Record<string, any>>;
 
 export function ResetResultOutputDir():Promise<Record<string, any>>;
 
+export function SaveDuckMailConfigs(arg1:string):Promise<Record<string, any>>;
+
 export function SaveMoeMailConfigs(arg1:string):Promise<Record<string, any>>;
 
 export function SelectDirectory():Promise<string>;
@@ -64,6 +68,8 @@ export function SetResultOutputDir(arg1:string):Promise<Record<string, any>>;
 export function StartTask(arg1:task.StartTaskRequest):Promise<Record<string, any>>;
 
 export function StopTask():Promise<Record<string, any>>;
+
+export function TestDuckMailConnection(arg1:string):Promise<Record<string, any>>;
 
 export function TestMoeMailConnection(arg1:string):Promise<Record<string, any>>;
 

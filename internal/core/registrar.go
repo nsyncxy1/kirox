@@ -295,6 +295,21 @@ func (r *Registrar) Step3Email() error {
 		log.Printf("email=%s", r.Email)
 		return nil
 	}
+
+	// DuckMail 模式：使用已由 coordinator 创建好的 DuckMailProvider
+	if r.Cfg.UseDuckMail && r.Cfg.DuckMailProvider != nil {
+		log.Println("[3] 使用 DuckMail 临时邮箱")
+		if r.Cfg.DuckMailConfig == nil {
+			return fmt.Errorf("DuckMail 配置为空，无法初始化邮箱服务")
+		}
+		adapter := email.NewDuckMailService(*r.Cfg.DuckMailConfig)
+		adapter.SetProvider(r.Cfg.DuckMailProvider)
+		r.EmailSvc = adapter
+		r.Email = r.Cfg.DuckMailProvider.GetAddress()
+		log.Printf("email=%s", r.Email)
+		return nil
+	}
+
 	log.Println("[3] 创建临时邮箱")
 	// 如果未配置 MoEmail URL，从已保存的 MoeMail 配置中自动读取
 	baseURL := r.Cfg.MoEmailBaseURL

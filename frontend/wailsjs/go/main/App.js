@@ -34,6 +34,10 @@ export function GetDataDir() {
   return window['go']['main']['App']['GetDataDir']();
 }
 
+export function GetDuckMailConfigs() {
+  return window['go']['main']['App']['GetDuckMailConfigs']();
+}
+
 export function GetLicenseInfo() {
   return window['go']['main']['App']['GetLicenseInfo']();
 }
@@ -94,6 +98,10 @@ export function ResetResultOutputDir() {
   return window['go']['main']['App']['ResetResultOutputDir']();
 }
 
+export function SaveDuckMailConfigs(arg1) {
+  return window['go']['main']['App']['SaveDuckMailConfigs'](arg1);
+}
+
 export function SaveMoeMailConfigs(arg1) {
   return window['go']['main']['App']['SaveMoeMailConfigs'](arg1);
 }
@@ -124,6 +132,10 @@ export function StartTask(arg1) {
 
 export function StopTask() {
   return window['go']['main']['App']['StopTask']();
+}
+
+export function TestDuckMailConnection(arg1) {
+  return window['go']['main']['App']['TestDuckMailConnection'](arg1);
 }
 
 export function TestMoeMailConnection(arg1) {
