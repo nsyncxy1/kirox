@@ -386,39 +386,10 @@ window.addEventListener('DOMContentLoaded', async function() {
   initEmailProviderSelection();
   // 初始化 DuckMail
   if (typeof initDuckMail === 'function') initDuckMail();
-  // 启动时静默检查更新
-  setTimeout(checkUpdateOnStartup, 2000);
 });
 
-async function checkUpdateOnStartup() {
-  try {
-    var result = await window.go.main.App.CheckUpdate();
-    if (result && result.hasUpdate) {
-      if (typeof showUpdateModal === 'function') showUpdateModal(result);
-    }
-  } catch(e) {}
-}
-
-// 侧边栏信息按钮：10次点击触发调试弹窗
-var _infoClickCount = 0;
-var _infoClickTimer = null;
 function onNavInfoClick() {
   switchPage('info');
-  _infoClickCount++;
-  clearTimeout(_infoClickTimer);
-  _infoClickTimer = setTimeout(function() { _infoClickCount = 0; }, 2000);
-  if (_infoClickCount >= 10) {
-    _infoClickCount = 0;
-    if (typeof showUpdateModal === 'function') {
-      showUpdateModal({
-        currentVersion: 'v1.0.1',
-        latestVersion: 'v99.0.0',
-        releaseDate: new Date().toISOString().slice(0, 10),
-        changelog: '## 调试模式\n- 这是一条测试更新弹窗\n- 触发方式：点击信息按钮 10 次',
-        hasUpdate: true
-      });
-    }
-  }
 }
 
 function renderChangelog(md) {

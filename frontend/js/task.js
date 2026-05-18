@@ -211,29 +211,15 @@ async function stopTask() {
 // ===== 更新系统 =====
 
 if (window.runtime) {
-  window.runtime.EventsOn('update-available', function(data) {
-    updateInfo = data;
-    showUpdateModal(data);
-  });
   window.runtime.EventsOn('update-progress', function(progress, downloaded, total) {
     updateDownloadProgress(progress, downloaded, total);
   });
 }
 
 function showUpdateModal(data) {
-  document.getElementById('update-current-version').textContent = data.currentVersion || '-';
-  document.getElementById('update-latest-version').textContent = data.latestVersion || data.version || '-';
-  document.getElementById('update-release-date').textContent = data.releaseDate || '-';
-  document.getElementById('update-changelog').textContent = data.changelog || '-';
-  
-  // 重置进度条状态，防止显示上一次下载卡住的进度
-  document.getElementById('update-progress-container').style.display = 'none';
-  var progressBar = document.getElementById('update-progress-bar');
-  var progressText = document.getElementById('update-progress-text');
-  if (progressBar) progressBar.style.width = '0%';
-  if (progressText) progressText.textContent = '0% (0.0 MB / 0.0 MB)';
-  
-  document.getElementById('update-modal').classList.add('show');
+  // 已禁用更新弹框，仅以 toast 形式提示
+  var ver = (data && (data.latestVersion || data.version)) || '';
+  showToast('发现新版本' + (ver ? ': ' + ver : ''));
 }
 
 async function closeUpdateModal() {
